@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+	<meta charset='utf-8'>
+	<title> Binaries </title>
+	<meta charset="utf-8" name="viewport" content="width=device-width, initial-scale=1">
+	<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+	<style>
+body {
+	font-family: 'Roboto', sans-serif;
+}
+
+.data-input {
+	width: 70%;
+	text-align: center;
+	margin: auto;
+	margin-top: 50pt;
+}
+
+.data-input .data-entry {
+	font-size: 1.5rem;
+	margin-top: 0.5rem;
+}
+
+.data-input .data-entry input {
+	margin-top: 0.5rem;
+	color: #111111;
+	font-size: 1.5rem;
+	padding: 1rem 1.2rem;
+	background-color: white;
+	border-radius: 0.3rem;
+	border: 1px solid #111111;
+	width: 80%;
+}
+
+.data-input button {
+	margin-top: 2.5rem;
+	margin-bottom: 2.5rem;
+	color: #111111;
+	font-size: 1.5rem;
+	padding: 1rem 1.2rem;
+	background-color: white;
+	border-radius: 0.3rem;
+	border: 1px solid #111111;
+	width: 95%;
+}
+
+h1 {
+	color: blue;
+}
+
+@media screen and (min-width: 900px) {
+	.data-input {
+		width: 20%;
+	}
+	.data-input button {
+		width: 60%;
+	}
+}
+*/
+	</style>
+</head>
+
+<body>
+	<div class='data-input'>
+		<h1> Input the data </h1>
+		<div class='data-entry'> <label> First body mass <br> (solar masses) </label> <br> <input type='text' id='first-mass' value='1.441'> </div>
+		<div class='data-entry'> <label> Second body mass <br> (solar masses) </label> <br> <input type='text' id='second-mass' value='1.387'> </div>
+		<div class='data-entry'> <label> Semi-major axis <br> (millions km) </label> <br> <input type='text' id='axis' value='1.95'> </div>
+		<div class='data-entry'> <label> Eccentricity </label> <br> <input type='text' id='eccentricity' value='0.617'> </div>
+		<div class='data-entry'> <label> Time for simulation <br> (seconds) </label> <br> <input type='text' id='time' value='1'> </div>
+		<button onclick='apiCall()' id='button'> Compute </button>
+	</div>
+
+	<div id='data-out'>
+	</div> 
+	<br>
+</body>
+
+<script>
+var data;
+
+function request(url) {
+	var xhr = new XMLHttpRequest();
+	xhr.open('GET', url, false);
+	xhr.send();
+	return xhr.response;
+}
+
+function clearChart() {
+	let canvas = document.getElementById('data-out');
+	for (el of canvas)
+		el.remove();
+}
+
+function createChart(name, y, title, xaxis, yaxis) {
+	let canvas = document.getElementById('data-out');
+	let linebreak = document.createElement('br');
+	let el = document.createElement('div');
+	el.setAttribute('id', name);
+	canvas.appendChild(linebreak);
+	canvas.appendChild(el);
+	let schema = [{
+		x: data.Time,
+		y: y,
+		mode: 'line',
+		line: {
+			color: 'rgb(0, 0, 255)',
+			width: 4
+		}
+	}];
+	let layout = {
+		xaxis: {title: xaxis},
+		yaxis: {title: yaxis},
+		margin: {
+			l: 65,
+			r: 55,
+			b: 50,
+			t: 50,
+			tab: 4
+		}
+	};
+	Plotly.newPlot(name, schema, layout);
+}
+
+function apiCall() {
+	var input = [];
+	input[0] = document.getElementById('first-mass').value;
+	input[1] = document.getElementById('second-mass').value;
+	input[2] = document.getElementById('axis').value;
+	input[3] = document.getElementById('eccentricity').value;
+	input[4] = document.getElementById('time').value;
+	
+	if (input.some(x => isNaN(x)) || input.some(x => x=='')) alert('Fill in the grids');
+	else {
+		socket = new WebSocket(`ws://localhost:8080/api?&first_mass=${input[0]}&second_mass=${input[1]}&axis=${input[2]}&eccentricity=${input[3]}&time=${input[4]}`);
+
+		socket.onopen = function(event) {
+			console.log('WebSocket is set up');
+			socket.send('ok');
+			data = {
+				'A': [],
+				'E': [], 
+				'W': [],
+				'T': [],
+				'Time': [], 
+				'dT': []
+			}
+		}
+		socket.onmessage = function(event) {
+			socket.send('ok');
+			resp = JSON.parse(event.data);
+			data.A.push(parseFloat(resp.A).toPrecision(3));
+			data.E.push(parseFloat(resp.E).toPrecision(3));
+			data.W.push(Math.log(parseFloat(resp.W).toPrecision(3)));
+			data.T.push(parseFloat(resp.T).toPrecision(3));
+			data.Time.push(parseFloat(resp.Time).toPrecision(3));
+			data.dT.push(parseFloat(resp.dT).toPrecision(3));
+		}
+		socket.onclose = function(event) {
+			console.log('WebSocket is closed');
+			let canvas = document.getElementById('data-out');
+			canvas.innerHTML = "";
+			createChart('stat-A', data.A, 'A', 'Time [years]', 'Major axis [m]');
+			createChart('stat-E', data.E, 'E', 'Time [years]', 'Eccentricity');
+			createChart('stat-W', data.W, 'W', 'Time [years]', 'ln Power [W]');
+			createChart('stat-T', data.T, 'T', 'Time [years]', 'Period [hours]');
+			createChart('stat-dT', data.dT, 'dT', 'Time [years]', 'Delta period [mcs per year]');
+		}
+		alert("Computing has started. Tap to proceed")
+	}
+}
+</script>
+
+</html>
