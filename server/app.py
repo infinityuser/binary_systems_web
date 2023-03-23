@@ -13,8 +13,6 @@ async def create_app(config_name):
 
 	app.router.add_get('/', index)
 	app.router.add_view('/api', api_call)
-	app.router.add_static('/static', './static', name='static')
-	app['static_root_url'] = './static' 
 	return app
 
 if __name__ == '__main__':

@@ -1,19 +1,24 @@
-The given implements a RESTful CRUD API using an asynchronous framework AIOHTTP. 
+A research project, 2022-2023. Kazakhstan, Kostanay.
 
-Communication between the client and the server is implemented via JSON. All the fields and IDs are in an attached to a request JSON.  
+The web application models and demonstrates a process of evolution of a two-body system with an arbitrary eccentricity in real time. The process of evolutions considers only gravitational waves emission which is found to be sufficient enough to lead the whole system to change and give accurate estimations.
 
-1. `/ | GET` - an index page. Print `Hello world!`
-2. `/api/user | GET` - get a row with the specified fields  
-3. `/api/user | POST` - create a row with the specified fields 
-4. `/api/user | PUT` - update a row with the specified ID and new values 
-5. `/api/user | DELETE` - delete a row with the specified ID or fields
+The program models binary systems with the given parameters and illustrates how the binary evolves. It displays how specific parameters of the binary system change over time. 
 
-Here are some illustrations: 
+The interface consists of:
 
-![alt image](./pics/image3.png)
+1. masses of the first and second bodies
+2. semi-major axis
+3. eccentricity
+4. time for simulation.
+
+The application is designed for a smartphone screen size.  
+
+Copyright 2022-2023 Bogdan Yakupov. All rights reserved.
+
+Illustrations:
+
+![alt image](./pics/image1.png)
 
 ![alt image](./pics/image2.png)
 
-![alt image](./pics/image4.png)
-
-![alt image](./pics/image1.png)
+![alt image](./pics/image3.png)
