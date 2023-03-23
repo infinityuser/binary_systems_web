@@ -1,8 +1,6 @@
 A research project, 2022-2023. Kazakhstan, Kostanay.
 
-The web application models and demonstrates a process of evolution of a two-body system with an arbitrary eccentricity in real time. The process of evolutions considers only gravitational waves emission which is found to be sufficient enough to lead the whole system to change and give accurate estimations.
-
-The program models binary systems with the given parameters and illustrates how the binary evolves. It displays how specific parameters of the binary system change over time. 
+The program models binary systems with the given parameters and illustrates how the binary evolves. It displays how specific parameters of the binary system change over time. The process of evolutions considers only gravitational waves emission which is found to be sufficient enough to lead the whole system to change and give accurate estimations.
 
 The interface consists of:
 
